@@ -1,6 +1,6 @@
 # End-to-end evals
 
-These cases run the whole flow with `claude -p` in an isolated folder, because a logo is judged by looking at it and the gates need pre-filled answers. Trigger checks (E3) and the nine-grid-only flow (E4) also run as plugin evals from the plugin's `evals/` folder.
+These cases run the whole flow with `claude -p` in an isolated folder, because a logo is judged by looking at it and the gates need pre-filled answers. Trigger checks (E3) and the nine-grid-only flow (E4) also run as plugin evals from the plugin's `evals/` folder. `claude plugin eval` runs a shell only inside a sandbox (Linux and macOS today), so on Windows E4 runs here instead.
 
 | Case | Input | Checked by script | Judged by a person |
 |---|---|---|---|

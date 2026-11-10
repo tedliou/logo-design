@@ -93,6 +93,8 @@ There are five eval cases (E0 to E4), described in `skills/designing-logos/evals
 claude plugin eval . --ablation none --allow-tools Bash --runs 1
 ```
 
+E4 runs Node scripts, and `claude plugin eval` runs a shell only where it can sandbox it, currently Linux and macOS. On Windows, use `node skills/designing-logos/evals/run.mjs E4 --group skill`.
+
 ## License
 
 MIT

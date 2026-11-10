@@ -93,6 +93,8 @@ cd ~/.claude/plugins/cache/logo-design/logo-design/0.1.0 && npm install
 claude plugin eval . --ablation none --allow-tools Bash --runs 1
 ```
 
+E4 要執行 Node 腳本，`claude plugin eval` 只在能把 shell 關進沙箱的環境才會執行，目前是 Linux 與 macOS。Windows 上改用 `node skills/designing-logos/evals/run.mjs E4 --group skill`。
+
 ## 授權
 
 MIT
