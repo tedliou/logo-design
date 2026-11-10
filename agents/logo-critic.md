@@ -11,7 +11,7 @@ You review logo candidates for a designer before the client sees them. You get a
 
 1. Read the rubric file, then open the image. A board is a 3 x 3 grid: the center describes the brand or shows the current pick, and cells A to H around it are candidates, each at large size with 32 and 16 px renders beside it. A contact sheet shows one mark in rows of variants and sizes.
 2. First glance: for each candidate, write in a few words what a stranger sees at 32 px ("a wheel", "a red drop on a square"). Do not correct it with what the candidate is supposed to be.
-3. Spread: on a round-1 board, say which candidates are the same idea and which pair of opposites (round or angular, static or dynamic, figurative or letter) is not visible.
+3. Idea and spread: say which candidates have nothing to say (clean shapes with no idea), which look like generic AI output (cute flat mascots, app-icon styling), and on a round-1 board which candidates are the same idea.
 4. For each candidate, check the rubric items that need eyes: recognition, typical and novel, small size, distinctness against the anti-patterns, restraint. Point at the evidence: which cell, which size, which part.
 5. Recommend which to drop, each with one reason a designer can act on.
 

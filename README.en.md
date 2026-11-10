@@ -19,17 +19,17 @@ Design a logo: Ade Cycles, the neighborhood repair shop people trust
 - Say "this is the one" when it is. Claude then builds the construction grid, redraws 16 and 32 px, makes one-color and inverse versions, and exports the files.
 - Give a photo with the brief ("turn this photo into a mark: ~/Pictures/cat.jpg") and Claude measures its features and colors first, without questions.
 
-## Where the eight directions come from
+## What each round draws
 
-Round 1 uses three pairs that people tell apart at a glance; two sides of three pairs give exactly eight cells:
-
-| Pair | Research |
+| Round | The eight cells |
 | --- | --- |
-| Round or angular | Jiang et al. 2016; Bar and Neta 2006 |
-| Static or dynamic | Cian et al. 2014; Luffarelli et al. 2019 |
-| Figurative or letter | Luffarelli, Mudra and Mahmood 2019; Henderson and Cote 1998 |
+| 1 | Eight concepts, each fusing two or three motifs into one shape ("the yawning mouth is a flame"). With a photo, every cell uses its strongest feature |
+| 2 | Your pick redrawn with eight form operations: silhouette, skeleton, motion, figure-ground, subtraction, fusion, substitution, cut |
+| 3 and later | One detail changed per cell: container, weight, where the accent sits |
 
-From round 2 on, your pick sits in the center and each cell changes one finer attribute (container, mark type, weight), with one deliberate wildcard so the search does not narrow too early. Seeing several designs at once beats refining one at a time (Dow et al. 2010), and moving the pick to the center resembles Picbreeder's branching. No study shows these three pairs cover every difference, so they are a default, not a law. Sources and their verification status are in [evidence.md](skills/designing-logos/references/evidence.md).
+From round 2 on, one cell is a deliberate wildcard so the search does not narrow too early. Round 1 also spreads its cells over three pairs people tell apart at a glance: round or angular (Jiang et al. 2016), static or dynamic (Cian et al. 2014), figurative or letter (Luffarelli, Mudra and Mahmood 2019). Seeing several designs at once beats refining one at a time (Dow et al. 2010), and moving the pick to the center resembles Picbreeder's branching. Sources and their verification status are in [evidence.md](skills/designing-logos/references/evidence.md).
+
+The skill runs at xhigh effort. With a photo and a short brief, three rounds and the final took about an hour and about 16 USD on Opus 5.5 in testing.
 
 ## One design document
 

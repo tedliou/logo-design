@@ -20,7 +20,7 @@ node scripts/selftest.mjs
 One case with the skill (run folders go under `$LOGO_EVAL_ROOT`, default `<system temp>/logo-eval`, or `--out`):
 
 ```bash
-node evals/run.mjs E4 --group skill --effort medium
+node evals/run.mjs E4 --group skill --effort xhigh
 ```
 
 No-skill arms for a blind comparison:

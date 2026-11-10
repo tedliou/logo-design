@@ -1,26 +1,28 @@
 ---
 name: designing-logos
-description: Designs a logo mark with the user by showing, not asking. From a one-line brief it draws a 3x3 board of eight visually different directions around the brief, the user picks a cell, the pick moves to the center and eight finer variations grow around it, until the user settles; then it builds the construction grid, small sizes and delivery files. Everything lives in one design document. Use when the user wants to create or redesign a logo, symbol, brand mark or mascot mark, or to turn a photo into a mark.
+description: Designs a logo mark with the user by showing, not asking. From a one-line brief it draws a 3x3 board of eight concepts around the brief; the user picks a cell, the pick moves to the center and is redrawn with eight form operations, then refined one attribute at a time until the user settles; then it builds the construction grid, small sizes and delivery files. Everything lives in one design document. Use when the user wants to create or redesign a logo, symbol, brand mark or mascot mark, or to turn a photo into a mark.
 when_to_use: The user asks to design a logo, mark, trademark or brand symbol (for example 「設計 logo」「做標誌」「商標」「品牌圖形」), to explore logo directions on a nine-grid (「九宮格」), or to turn a photo into a mark (「把照片變成標誌」). A mark drawn entirely as pixel art, or a 16 or 32 px pixel icon, goes to designing-pixel-logos. Exporting an existing logo to other file formats, or editing a site's header CSS, does not need this skill.
 argument-hint: "[brand name and one sentence, optionally a photo path]"
 allowed-tools: Bash(node "${CLAUDE_SKILL_DIR}/scripts/*)
+effort: xhigh
 license: MIT
 ---
 
 # Designing logos
 
-Designers decide by looking. This skill draws first and asks almost nothing: the user answers each round with a letter. The bar is a trademark, not an illustration: every element has a reason, the final construction is measurable, and the mark reads at 16 px.
+Designers decide by looking. This skill draws first and asks almost nothing: the user answers each round with a letter. The bar is a trademark, not an illustration: every element has a reason, the final construction is measurable, and the mark reads at 16 px. The depth comes first and the polish last: round 1 decides what the mark says, round 2 how it is built, later rounds the details. Work at high effort throughout; quick sketches with nothing to say are the failure this skill exists to prevent.
 
 ## Rules that always hold
 
 1. Draw before you ask. The first reply to a brief is round 1 (references/rounds.md). Ask only for the brand name when it is missing.
-2. Every message to the user is three lines or fewer, the final one included: where to look and how to answer. The picture carries the content; reasons, rationale and file lists live in the document, which the user opens when they want them.
-3. One working file per project: `design.html`, written only through `design.mjs`. Scratch files go to the work folder that `design.mjs work` prints, never next to the document.
-4. Record every answer with `design.mjs pick` or `settle` before drawing the next round. A guessed answer looks like a decision but carries none of the user's intent.
-5. Measure a photo before drawing (references/photo.md). What makes a subject itself is how it differs from the typical one, and only the source shows that.
-6. Marks use flat fills from the palette and no text, filters or images. Texture belongs to the final presentation sheet.
-7. Take principles from reference work, never shapes. Similarity to an existing mark is a defect.
-8. Mark a claim in the rationale as sourced or as inference; golden-ratio construction claims are out (references/evidence.md).
+2. Every cell carries an idea: two or three motifs fused into one shape. A clean shape with nothing to say reads as careless, and a cute flat drawing of the subject reads as generic AI output; the reviewer rejects both before the user sees the board.
+3. Every message to the user is three lines or fewer, the final one included: where to look and how to answer. The picture carries the content; reasons, rationale and file lists live in the document, which the user opens when they want them.
+4. One working file per project: `design.html`, written only through `design.mjs`. Scratch files go to the work folder that `design.mjs work` prints, never next to the document.
+5. Record every answer with `design.mjs pick` or `settle` before drawing the next round. A guessed answer looks like a decision but carries none of the user's intent.
+6. Measure a photo before drawing (references/photo.md). What makes a subject itself is how it differs from the typical one, and only the source shows that.
+7. Marks use flat fills from the palette and no text, filters or images. Texture belongs to the final presentation sheet.
+8. Take principles from reference work, never shapes. Similarity to an existing mark is a defect.
+9. Mark a claim in the rationale as sourced or as inference; golden-ratio construction claims are out (references/evidence.md).
 
 ## Start
 
@@ -44,17 +46,17 @@ The page cannot send clicks back to you. The user taps cells, presses "Copy for 
 ## Flow
 
 ```
-brief (+ photo) -> measure photo -> round 1: eight corners -> pick -> round 2 around the pick -> ... -> settle -> detail -> export
+brief (+ photo) -> measure photo -> round 1: eight concepts -> pick -> round 2: eight form operations -> pick -> round 3+: one attribute per cell -> settle -> review -> detail -> export
 ```
 
 | Step | Read first | Command |
 |---|---|---|
 | Measure a photo | references/photo.md | `photo`, then measure.mjs and palette.mjs, then `attach` |
-| Draw a round | references/rounds.md | `preview`, reviewer on round 1, then `round` |
+| Draw a round | references/rounds.md | `preview`, reviewer on rounds 1 and 2, then `round` |
 | Record the answer | references/rounds.md | `pick <letters> --note --prefs`, or `settle <letter>` |
-| Build the final | references/detail.md | `detail <detail.json>` (checks, exports, finishes the document) |
+| Build the final | references/detail.md | reviewer on the final, then `detail <detail.json>` (checks, exports, finishes the document) |
 
-The reviewer is the `logo-critic` subagent. It sees the board image and the brief, never your reasons. Run it on round 1 before showing, and on the final contact sheet (references/rubric.md).
+The reviewer is the `logo-critic` subagent. It sees the board image and the brief, never your reasons. Run it on rounds 1 and 2 before showing, and on the final contact sheet (references/rubric.md).
 
 When `status` reports eval mode, nobody will answer: take each round's pick from the rule it prints, settle where it says, and do not publish pages or send files.
 

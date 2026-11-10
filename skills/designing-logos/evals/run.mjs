@@ -21,7 +21,7 @@ const args = process.argv.slice(2);
 const opt = (n, d) => { const i = args.indexOf(n); return i >= 0 ? args[i + 1] : d; };
 const VALUE = new Set(['--group', '--effort', '--budget', '--model', '--out', '--parallel']);
 const ids = args.filter((a, i) => !a.startsWith('--') && !VALUE.has(args[i - 1]));
-const group = opt('--group', 'skill'), effort = opt('--effort', 'medium'), model = opt('--model', 'opus');
+const group = opt('--group', 'skill'), effort = opt('--effort', 'xhigh'), model = opt('--model', 'opus');
 const out = opt('--out', process.env.LOGO_EVAL_ROOT || join(tmpdir(), 'logo-eval'));
 const parallel = Math.min(3, Number(opt('--parallel', 1)));
 const dry = args.includes('--dry-run');

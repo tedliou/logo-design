@@ -1,12 +1,13 @@
 # Rubric and the reviewer
 
-Read this before running the reviewer: on round 1 before the user sees it, and on the final. Scripts judge what can be computed; the reviewer judges what needs eyes; the user judges meaning and taste.
+Read this before running the reviewer: on rounds 1 and 2 before the user sees them, and on the final. Scripts judge what can be computed; the reviewer judges what needs eyes; the user judges meaning and taste.
 
 ## Criteria
 
 | Criterion | Question | Checked by |
 |---|---|---|
 | Recognition | Is the first thing seen the intended subject or letter? Could it be read as something else? | Reviewer |
+| Idea | Does each cell say something, two or three motifs fused into one shape? A clean geometric shape with nothing to say is careless; a cute drawing of the subject is the generic AI look | Reviewer |
 | Spread (round 1) | Do the eight cells look like eight different directions at 32 px, or like one idea eight times? | Reviewer |
 | Typical and novel | Recognizable as its kind, and with a treatment not seen before? Judge the two separately (Hekkert and others 2003) | Reviewer |
 | Small size | Does the 16 px render keep the main shape? | `design.mjs` refuses cells that vanish; reviewer for the rest |
@@ -17,7 +18,8 @@ Read this before running the reviewer: on round 1 before the user sees it, and o
 
 ## Anti-patterns
 
-- A cute drawing of the subject with no idea and no construction.
+- A cute drawing of the subject with no idea and no construction: flat mascot faces, app-icon tiles, emoji-like expressions. This is what a model draws by default and people recognize it at once.
+- A clean geometric shape with nothing to say: blocks, notches and wedges arranged until they look designed.
 - Category defaults used alone: gear, light bulb, brain, globe, rocket, `</>`, a shield with a face.
 - Gradients, drop shadows, glows, fake 3D, an outline around everything.
 - One style over the whole mark (all pixels, all glitch); a style signal belongs on the part it refers to.
@@ -37,7 +39,7 @@ Board or contact sheet: <path to the PNG>
 Brand: <name>, <the user's sentence>
 Learned preferences: <prefs, or "none yet">
 Rubric: <skill dir>/references/rubric.md
-Candidates: <ids with their tags, no reasons>
+Candidates: <ids with their tags and concept sentences, no reasons>
 ```
 
    When no `logo-critic` agent is available, start a general-purpose subagent with the same brief plus: "Follow the procedure in <path of logo-critic.md>" (`agents/logo-critic.md` at the plugin root, or `.claude/agents/logo-critic.md` in a project).

@@ -1,6 +1,6 @@
 {
   "skill_name": "designing-logos",
-  "notes": "End-to-end cases run with evals/run.mjs (claude -p in an isolated folder under $LOGO_EVAL_ROOT, default <system temp>/logo-eval). Nobody can pick in those runs, so the skill arm gets fixtures/<case>/picks.json (a pick rule per round and the round to settle at); the bare arm gets the same information in its prompt. Photos are copied into the run folder; originals are never written to. E3 also runs as a plugin eval. Free checks first: node scripts/selftest.mjs.",
+  "notes": "End-to-end cases run with evals/run.mjs (claude -p in an isolated folder under $LOGO_EVAL_ROOT, default <system temp>/logo-eval). Nobody can pick in those runs, so the skill arm gets fixtures/<case>/picks.json (a pick rule per round and the round to settle at); the bare arm gets the same information in its prompt. Photos are copied into the run folder; originals are never written to. E3 also runs as a plugin eval. Run the skill arm at xhigh, the effort the skill sets. Free checks first: node scripts/selftest.mjs.",
   "evals": [
     {
       "id": 0,
@@ -8,6 +8,7 @@
       "name": "E0 nine-grid cat replay",
       "files": [],
       "budget": {
+        "skill-xhigh": 30,
         "skill-medium": 15,
         "bare-medium": 10,
         "bare-max": 25
@@ -29,6 +30,7 @@
       "name": "E1 sunset clouds, no fixed subject",
       "files": [],
       "budget": {
+        "skill-xhigh": 30,
         "skill-medium": 15
       },
       "prompt": "/designing-logos 幫「20240707 火燒雲」這組照片做系列標誌，用在相簿封面與社群分享圖。照片在 source/DSC08531-Enhanced-NR.jpg。我現在沒辦法即時回答，每一輪怎麼選寫在 picks.json，建立設計文件時加 --picks picks.json。完成後把定稿另存一份到 final/mark.svg；如果小尺寸另外畫了版本，存成 final/mark-16.svg、final/mark-32.svg。",
@@ -46,6 +48,7 @@
       "name": "E2 user who cannot say what they want",
       "files": [],
       "budget": {
+        "skill-xhigh": 30,
         "skill-medium": 15
       },
       "prompt": "/designing-logos 我想幫我家的腳踏車行「阿德單車」做個標誌，但我也說不太出來要什麼。我現在沒辦法即時回答，每一輪怎麼選寫在 picks.json，建立設計文件時加 --picks picks.json。完成後把定稿另存一份到 final/mark.svg；如果小尺寸另外畫了版本，存成 final/mark-16.svg、final/mark-32.svg。",
@@ -82,6 +85,7 @@
       "name": "E4 the first reply is a board",
       "files": [],
       "budget": {
+        "skill-xhigh": 8,
         "skill-medium": 5
       },
       "prompt": "幫我設計一個 logo：阿德單車，街坊信得過的修車師傅。",

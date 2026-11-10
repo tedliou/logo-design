@@ -18,8 +18,9 @@ Check: `design.mjs detail` printed "final: 0 violations".
 1. Choose the grid: a canvas that is a multiple of 16 (96, 128), large enough that the thinnest line is one whole unit. Write major lines from the structure (module widths, gutters).
 2. Redraw the master on that grid: integer vertices, edges at the angle set, arcs at family radii, letters as paths.
 3. Draw the 16 and 32 px sprites (designing-pixel-logos), each in the same palette.
-4. Write `<work>/detail.json` (below) and run `node design.mjs detail <design.html> <work>/detail.json`. It runs the construction check, refuses on violations and says what to move, and on success writes the delivery package next to design.html in `export/`, with the construction sheet, the presentation sheet and the final section of the document.
-5. Tell the user in three lines or fewer: the document is final, where it is, and that a change is one more round. The element meanings, construction and file list are already in the document; do not repeat them in chat.
+4. Review the final: render the master's contact sheet (`render.mjs`) and run the reviewer on it (rubric.md). If its first glance is not what the mark should read as ("looks like the letter M" for a cat), revise the master and review again. Record the last review in `review`.
+5. Write `<work>/detail.json` (below) and run `node design.mjs detail <design.html> <work>/detail.json`. It runs the construction check, refuses on violations and says what to move, and on success writes the delivery package next to design.html in `export/`, with the construction sheet, the presentation sheet and the final section of the document.
+6. Tell the user in three lines or fewer: the document is final, where it is, and that a change is one more round. The element meanings, construction and file list are already in the document; do not repeat them in chat.
 
 While refining, `node render.mjs <mark.svg> --constants <constants.json>` draws a contact sheet (color, one color, inverse; paper, white, ink; magnified small sizes; blur), and `node check.mjs <constants.json>` lists violations. Write those scratch files in the work folder.
 
@@ -40,7 +41,8 @@ While refining, `node render.mjs <mark.svg> --constants <constants.json>` draws 
   "mark": "<svg viewBox=\"0 0 96 96\" ...>",
   "ladder": { "16": "<svg viewBox=\"0 0 16 16\" ...>", "32": "<svg viewBox=\"0 0 32 32\" ...>" },
   "elements": [ { "form": "Round seal", "literal": "A badge", "figurative": "A shop you can trust" } ],
-  "presentation": { "paper": "#ece8e1", "print": 0.35 }
+  "presentation": { "paper": "#ece8e1", "print": 0.35 },
+  "review": { "firstGlance": "a round badge with an A and a wheel", "intended": "a bike shop's A with a wheel", "match": true }
 }
 ```
 
@@ -48,6 +50,7 @@ While refining, `node render.mjs <mark.svg> --constants <constants.json>` draws 
 - `accent.region` (x0, y0, x1, y1) keeps the accent on its element.
 - `elements`: one line each; an element without a figurative meaning is cut or redrawn.
 - `presentation` passes options to the print-texture sheet; omit it for the defaults.
+- `review`: the reviewer's first glance at 32 px, what the mark should read as, and whether they match. `detail` refuses without it, and refuses when `match` is false.
 
 ## Delivery
 

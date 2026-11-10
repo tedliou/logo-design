@@ -94,23 +94,40 @@ async function inkAt16(svg) {
   return differ / (16 * 16);
 }
 
+export const FORM_OPS = ['silhouette', 'skeleton', 'motion', 'figure-ground', 'subtraction', 'fusion', 'substitution', 'cut'];
+// Round kinds: meaning (round 1, or a restart), form (round 2), detail (round 3 and later).
+export const kindOf = (R, n) => R.kind || (n === 1 ? 'meaning' : n === 2 ? 'form' : 'detail');
+
 export function checkRound(R, n) {
   const errs = [], warns = [];
+  const kind = kindOf(R, n);
+  if (!['meaning', 'form', 'detail'].includes(kind)) errs.push(`kind "${kind}" is not meaning, form or detail`);
   if (!Array.isArray(R.cells) || R.cells.length !== 8) errs.push(`needs 8 cells, found ${R.cells?.length ?? 0}`);
   const ids = (R.cells || []).map((c) => c.id);
   if (ids.join('') !== IDS.join('')) errs.push(`cell ids must be A to H in order, found ${ids.join(',')}`);
+  const hasConcept = (c) => c.concept && String(c.concept).trim() && Array.isArray(c.motifs) && c.motifs.length >= 2 && c.motifs.length <= 3;
   for (const c of R.cells || []) {
     if (!c.tag || !String(c.tag).trim()) errs.push(`${c.id}: tag is empty; give a label of a few words`);
     else if ([...String(c.tag)].length > 12) warns.push(`${c.id}: tag "${c.tag}" is long; keep labels to about six characters or three words`);
-    if (!c.why || !String(c.why).trim()) errs.push(`${c.id}: why is empty; one line on what the cell tries (shown only in the history)`);
+    if (!c.why || !String(c.why).trim()) errs.push(`${c.id}: why is empty; one line on what the cell tries`);
+    if ((kind === 'meaning' || c.outlier) && !hasConcept(c)) errs.push(`${c.id}: needs concept (one sentence) and motifs (two or three) fused into one shape; a shape with nothing to say is the "careless" failure`);
     const r = checkCellSvg(String(c.svg || ''), c.id);
     errs.push(...r.errs); warns.push(...r.warns);
   }
-  if (n === 1) {
-    const axes = (R.cells || []).map((c) => (Array.isArray(c.axes) ? c.axes.join('|') : ''));
-    if (axes.some((a) => !a)) errs.push('round 1 cells need axes: three words, one from each pair (round or angular, static or dynamic, figurative or letter)');
-    else if (new Set(axes).size !== 8) errs.push(`round 1 axes repeat (${axes.join('; ')}); the eight cells are the eight combinations of the three pairs`);
-  } else {
+  if (kind === 'meaning') {
+    const axes = (R.cells || []).map((c) => (Array.isArray(c.axes) && c.axes.length === 3 ? c.axes : null));
+    if (axes.some((a) => !a)) errs.push('meaning-round cells need axes: three words, one side of each pair (round or angular, static or dynamic, figurative or letter)');
+    else for (let k = 0; k < 3; k++) if (new Set(axes.map((a) => a[k])).size < 2) errs.push(`axes position ${k + 1} has only "${axes[0][k]}"; the board must show both sides of each pair`);
+    const lenses = new Set((R.cells || []).flatMap((c) => (c.motifs || []).map((m) => String(m).trim().toLowerCase())));
+    if (lenses.size < 8) warns.push(`only ${lenses.size} different motifs across the board; concepts that share motifs read as one idea`);
+  }
+  if (kind === 'form') {
+    const ops = (R.cells || []).filter((c) => !c.outlier).map((c) => c.op);
+    const bad = ops.filter((o) => !FORM_OPS.includes(o));
+    if (bad.length) errs.push(`form-round cells need op, one of ${FORM_OPS.join(', ')}; found ${bad.map(String).join(', ')}`);
+    else if (new Set(ops).size !== ops.length) errs.push(`form-round operations repeat (${ops.join(', ')}); use a different operation in every cell`);
+  }
+  if (n > 1) {
     const out = (R.cells || []).filter((c) => c.outlier);
     if (out.length !== 1) errs.push(`round ${n} needs exactly one cell with outlier: true (a deliberate departure), found ${out.length}`);
   }
@@ -138,11 +155,11 @@ function boardHtml(s, R, live) {
   R.cells.forEach((c, i) => {
     const picked = R.pick?.ids?.includes(c.id);
     const cls = ['cell', live ? 'pick' : '', c.outlier ? 'outlier' : '', picked ? 'chosen' : ''].filter(Boolean).join(' ');
-    const head = `<span class="lab"><b>${c.id}</b>${c.axes ? ` ${esc(c.axes.join(' / '))}` : ''}${c.outlier ? ` <em class="wild">${esc(ui(s.lang).outlier)}</em>` : ''}</span>`;
+    const head = `<span class="lab"><b>${c.id}</b>${c.axes ? ` ${esc(c.axes.join(' / '))}` : ''}${c.op ? ` ${esc(ui(s.lang)['op_' + c.op] || c.op)}` : ''}${c.outlier ? ` <em class="wild">${esc(ui(s.lang).outlier)}</em>` : ''}</span>`;
     const body = `<span class="art">${inline(c.svg, 'big', `r${R.n}${c.id}-`)}</span><span class="small">${inline(c.svg, 's32', `r${R.n}${c.id}s-`)}${inline(c.svg, 's16', `r${R.n}${c.id}t-`)}</span><span class="tag">${esc(c.tag)}</span>`;
     cells[POS[i]] = live
       ? `<button type="button" class="${cls}" data-id="${c.id}" data-tag="${esc(c.tag)}" aria-pressed="false">${head}${body}</button>`
-      : `<div class="${cls}" title="${esc(c.why || '')}">${head}${body}</div>`;
+      : `<div class="${cls}" title="${esc(c.concept || c.why || '')}">${head}${body}</div>`;
   });
   return `<div class="board" data-round="${R.n}">${cells.join('')}</div>`;
 }
@@ -194,6 +211,8 @@ const STRINGS = JSON.parse(readFileSync(join(dirname(dirname(fileURLToPath(impor
 export const ui = (lang) => ({ ...STRINGS.en, ...(STRINGS[lang] || {}) });
 const fmt = (str, v) => String(str).replace(/\{(\w+)\}/g, (m, k) => (v[k] != null ? v[k] : m));
 
+const conceptList = (R, T) => (R.cells.some((c) => c.concept) ? `<details class="concepts"><summary>${esc(T.concepts_summary)}</summary><ul>${R.cells.filter((c) => c.concept).map((c) => `<li><b>${c.id}</b> ${esc(c.concept)}</li>`).join('')}</ul></details>` : '');
+
 export async function renderHtml(s) {
   const T = ui(s.lang);
   const rounds = s.rounds || [];
@@ -219,7 +238,8 @@ ${(d.elements || []).length ? `<details><summary>${esc(T.elements_summary)}</sum
 <div class="reply"><p class="said" id="said"></p>
 <label class="sr" for="note">${esc(T.note_label)}</label><input id="note" type="text" placeholder="${esc(T.note_placeholder)}">
 <button type="button" id="send">${esc(T.send)}</button><button type="button" id="settle" class="alt" disabled>${esc(T.settle)}</button>
-<span class="done" id="done" aria-live="polite"></span></div></section>`);
+<span class="done" id="done" aria-live="polite"></span></div>
+${conceptList(cur, T)}</section>`);
   }
 
   if (s.photo) {
@@ -375,7 +395,7 @@ async function cmdRound() {
   }
   for (const w of warns) console.log(`WARN ${w}`);
   if (errs.length) { console.log(errs.map((e) => `FAIL ${e}`).join('\n')); console.log(`FAIL round ${n} not added; fix ${errs.length} problem${errs.length === 1 ? '' : 's'} and run again`); process.exit(1); }
-  s.rounds.push({ n, center: R.center || null, cells: R.cells.map(({ id, axes, tag, why, svg, outlier }) => ({ id, ...(axes ? { axes } : {}), tag, why, svg, ...(outlier ? { outlier: true } : {}) })), pick: null, at: now() });
+  s.rounds.push({ n, center: R.center || null, kind: kindOf(R, n), cells: R.cells.map(({ id, axes, tag, concept, motifs, op, why, svg, outlier }) => ({ id, ...(axes ? { axes } : {}), tag, ...(concept ? { concept } : {}), ...(motifs ? { motifs } : {}), ...(op ? { op } : {}), why, svg, ...(outlier ? { outlier: true } : {}) })), pick: null, at: now() });
   s.log.push({ at: now(), event: `round ${n}` });
   await save(file, s);
   const png = await boardPng(s, s.rounds[s.rounds.length - 1], join(workDir(file, s), `round-${n}.png`));
@@ -422,6 +442,8 @@ async function cmdDetail() {
   if (!dj || !existsSync(dj)) fail('give the detail JSON file (format in references/detail.md)');
   const D = JSON.parse(readFileSync(dj, 'utf8'));
   if (!D.mark || !D.constants) fail('detail JSON needs mark (the master SVG text) and constants');
+  if (!D.review?.firstGlance || !D.review?.intended) fail('detail JSON needs review: { firstGlance, intended, match } from the reviewer on the final contact sheet (references/detail.md); a final nobody looked at is not final');
+  if (D.review.match === false && !args.includes('--draft')) fail(`the reviewer saw "${D.review.firstGlance}" but the mark should read as "${D.review.intended}"; revise the mark and review again`);
   const W = join(workDir(file, s), 'detail');
   rmSync(W, { recursive: true, force: true }); mkdirSync(W, { recursive: true });
   const C = { ...D.constants, mark: 'mark.svg' };
@@ -449,7 +471,7 @@ async function cmdDetail() {
   const lad = [];
   for (const px of [16, 32, 64]) { const src = D.ladder?.[px] || D.mark; const png = await svgToPng(src, px); lad.push({ px, png: dataUri(png), mag: dataUri(await sharp(png).resize(128, 128, { kernel: 'nearest' }).png().toBuffer()) }); }
   s.detail = {
-    violations, elements: D.elements || [], constants: D.constants, mark: D.mark, ladder: D.ladder || {},
+    violations, review: D.review, elements: D.elements || [], constants: D.constants, mark: D.mark, ladder: D.ladder || {},
     fileCount: res.files.length + 3,
     images: { hero: dataUri(await svgToPng(D.mark, 240)), mono: dataUri(await svgToPng(variant(D.mark, 'mono', r), 120, 120, '#ffffff')), inverse: dataUri(await svgToPng(variant(D.mark, 'inverse', r), 120, 120, r.ink)), ladder: lad, construction: dataUri(consPng), presentation: dataUri(await sharp(presPng).resize(800).png().toBuffer()) },
   };

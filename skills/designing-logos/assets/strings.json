@@ -38,7 +38,16 @@
     "alt_mono": "One color",
     "alt_inverse": "Inverse",
     "alt_photo": "Source photo",
-    "outlier": "wildcard"
+    "outlier": "wildcard",
+    "concepts_summary": "What each cell means",
+    "op_silhouette": "silhouette",
+    "op_skeleton": "skeleton",
+    "op_motion": "motion",
+    "op_figure-ground": "figure-ground",
+    "op_subtraction": "subtraction",
+    "op_fusion": "fusion",
+    "op_substitution": "substitution",
+    "op_cut": "cut"
   },
   "zh-TW": {
     "title": "{name} 標誌",
@@ -79,6 +88,15 @@
     "alt_mono": "單色",
     "alt_inverse": "反白",
     "alt_photo": "來源照片",
-    "outlier": "刻意偏離"
+    "outlier": "刻意偏離",
+    "concepts_summary": "每一格的概念",
+    "op_silhouette": "剪影",
+    "op_skeleton": "骨架",
+    "op_motion": "動勢",
+    "op_figure-ground": "圖地",
+    "op_subtraction": "減法",
+    "op_fusion": "融合",
+    "op_substitution": "替換",
+    "op_cut": "切割"
   }
 }
