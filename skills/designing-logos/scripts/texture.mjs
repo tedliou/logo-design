@@ -51,7 +51,7 @@ export function presentationSvg(markText, { C = null, size = 1600, print = 0.35,
   const rough = (0.6 + 3.4 * p).toFixed(2);
   const fiberA = (0.05 * fiber).toFixed(3), grainA = (0.16 * grain).toFixed(3);
   const tf = `translate(${ox.toFixed(2)} ${oy.toFixed(2)}) scale(${k.toFixed(4)})`;
-  const plateFilter = (id, s) => `<filter id="${id}" x="-2%" y="-2%" width="104%" height="104%" color-interpolation-filters="sRGB">
+  const plateFilter = (id, s) => `<filter id="${id}" filterUnits="userSpaceOnUse" x="0" y="0" width="${size}" height="${size}" color-interpolation-filters="sRGB">
   <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" seed="${s}" result="n"/>
   <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  30 0 0 0 -${holeCut}" result="keep"/>
   <feComposite in="SourceGraphic" in2="keep" operator="in" result="speck"/>

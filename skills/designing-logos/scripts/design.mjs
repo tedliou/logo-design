@@ -145,7 +145,7 @@ const inline = (svg, cls, p) => prefixIds(String(svg), p).replace(/<\?xml[^>]*>/
 
 function centerHtml(s, R) {
   const chips = (s.prefs || []).map((t) => `<span class="chip">${esc(t)}</span>`).join('');
-  if (R.center?.svg) return `<span class="ctitle">${esc(ui(s.lang).center_label)}</span>${inline(R.center.svg, 'cart', `c${R.n}-`)}<span class="ctag">${esc(R.center.tag || '')}</span>${chips ? `<span class="chips">${chips}</span>` : ''}`;
+  if (R.center?.svg) return `<span class="ctitle">${esc(ui(s.lang).center_label)}</span><span class="cbox" style="background:${esc(rolesFor(R.center.svg, null).paper)}">${inline(R.center.svg, 'cart', `c${R.n}-`)}</span><span class="ctag">${esc(R.center.tag || '')}</span>${chips ? `<span class="chips">${chips}</span>` : ''}`;
   return `<span class="cname">${esc(s.name)}</span>${s.brief ? `<span class="cbrief">${esc(s.brief)}</span>` : ''}${chips ? `<span class="chips">${chips}</span>` : ''}`;
 }
 
@@ -173,7 +173,7 @@ const CSS = `.wrap{display:flex;flex-direction:column;gap:14px}
 .outlier{background:var(--off)}
 .center{background:var(--text);color:var(--bg);border-color:var(--text);justify-content:center;align-items:center;text-align:center}
 .cname{font-weight:900;font-size:clamp(18px,4vw,30px);line-height:1.2}.cbrief,.ctag,.ctitle{font-size:clamp(11px,2.2vw,14px);opacity:.85}
-.cart{width:70%;height:auto}.chips{display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
+.cbox{display:block;width:72%;border-radius:6px;padding:4%}.cart{width:100%;height:auto;display:block}.chips{display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
 .chip{font-size:12px;border:1px solid currentColor;border-radius:99px;padding:0 8px;opacity:.9}
 .lab{font-size:13px;color:var(--muted);line-height:1.3}.lab b{font-size:17px;color:var(--text);margin-right:4px}
 .art svg{width:100%;height:auto;display:block;border-radius:6px}
@@ -290,7 +290,7 @@ export async function boardPng(s, R, out) {
     if (k === 4) {
       layers.push({ input: { create: { width: C, height: C, channels: 4, background: '#27272a' } }, left: x, top: y });
       if (R.center?.svg) {
-        layers.push({ input: await svgToPng(R.center.svg, 200), left: x + 50, top: y + 44 });
+        layers.push({ input: await svgToPng(R.center.svg, 200, 200, rolesFor(R.center.svg, null).paper), left: x + 50, top: y + 44 });
         text.push(`<text x="${x + 14}" y="${y + 30}" font-size="18" style="fill:#fafafa">${esc(T.center_label)}</text>`);
       } else {
         const nameSize = Math.min(34, Math.floor(260 / Math.max(1, textWidth(s.name))));
