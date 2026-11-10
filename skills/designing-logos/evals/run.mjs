@@ -5,10 +5,10 @@
 //       [--out <root>] [--parallel <n>] [--dry-run]
 //
 // skill: the run folder gets .claude/skills/designing-logos and .claude/agents/logo-critic.md, and the
-//        case's skill prompt; answers.json comes from fixtures/<case>/.
+//        case's skill prompt; picks.json (how to pick each round) comes from fixtures/<case>/.
 // bare:  no skill (all skills and commands disabled); the case's bare prompt carries the same answers.
 // Each run writes transcript.jsonl, run.json (cost, turns, time) and checks.json into its folder.
-// Interactive gates cannot be answered here, so every case pre-fills answers.json (interview.md, Eval mode).
+// Nobody can pick in these runs, so each case gives a pick rule per round in picks.json.
 import { readFileSync, writeFileSync, mkdirSync, existsSync, cpSync, readdirSync, createWriteStream, statSync } from 'node:fs';
 import { join, dirname, resolve, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -49,8 +49,8 @@ function prepare(c) {
     cpSync(SKILL, join(dir, '.claude', 'skills', 'designing-logos'), { recursive: true, filter: (p) => !p.includes(`${basename(SKILL)}${process.platform === 'win32' ? '\\' : '/'}evals`) });
     const agent = REPO && join(REPO, '.claude', 'agents', 'logo-critic.md');
     if (agent && existsSync(agent)) { mkdirSync(join(dir, '.claude', 'agents'), { recursive: true }); cpSync(agent, join(dir, '.claude', 'agents', 'logo-critic.md')); }
-    const fx = join(EVALS, 'fixtures', c.key, 'answers.json');
-    if (existsSync(fx)) cpSync(fx, join(dir, 'answers.json'));
+    const fx = join(EVALS, 'fixtures', c.key, 'picks.json');
+    if (existsSync(fx)) cpSync(fx, join(dir, 'picks.json'));
   }
   return dir;
 }
@@ -92,47 +92,36 @@ function run(c, dir) {
 async function checks(c, dir) {
   const res = [];
   const add = (name, pass, detail = '') => res.push({ name, pass, detail });
-  const wbRoot = join(dir, 'work');
-  const wbs = existsSync(wbRoot) ? readdirSync(wbRoot).map((d) => join(wbRoot, d)).filter((p) => existsSync(join(p, 'state.json'))) : [];
-  const finalSvg = join(dir, 'final', 'mark.svg');
-  if (c.key !== 'E4') add('final/mark.svg exists', existsSync(finalSvg));
+  const root = join(dir, 'work');
+  const docs = existsSync(root) ? readdirSync(root).map((d) => join(root, d, 'design.html')).filter((p) => existsSync(p)) : [];
+  if (c.key !== 'E4') add('final/mark.svg exists', existsSync(join(dir, 'final', 'mark.svg')));
   const tr = existsSync(join(dir, 'transcript.jsonl')) ? readFileSync(join(dir, 'transcript.jsonl'), 'utf8') : '';
   const skillCalls = [...tr.matchAll(/"name":"Skill","input":\{"skill":"([^"]+)"/g)].map((m) => m[1]);
   if (group === 'bare') { writeFileSync(join(dir, 'checks.json'), JSON.stringify(res, null, 2)); return res; }
-  add('designing-logos loaded', skillCalls.some((s) => /designing-logos$/.test(s)) || /\/designing-logos/.test(c.prompt), skillCalls.join(', '));
-  add('one workbook created', wbs.length === 1, wbs.map((p) => basename(p)).join(', '));
-  if (!wbs.length) { writeFileSync(join(dir, 'checks.json'), JSON.stringify(res, null, 2)); return res; }
-  const wb = wbs[0], s = JSON.parse(readFileSync(join(wb, 'state.json'), 'utf8'));
-  const { gateStates, checkFile } = await import(pathUrl(join(SKILL, 'scripts', 'workbook.mjs')));
-  const st = Object.fromEntries(gateStates(s).map((g) => [g.id, g.state]));
-  const decisions = existsSync(join(wb, 'decisions.md')) ? readFileSync(join(wb, 'decisions.md'), 'utf8') : '';
-  for (const [id, state] of Object.entries(st)) if (state === 'done') add(`${id} has a decisions.md entry`, new RegExp(`## ${id} `).test(decisions));
-  const json = ['mandala.json', 'features.json', 'palette.json', 'directions.json', 'variants.json', 'elements.json', 'constants.json'].filter((f) => existsSync(join(wb, f)));
-  for (const f of json) { const e = checkFile(wb, f); add(`${f} passes workbook check`, !e.length, e.slice(0, 3).join('; ')); }
+  add('designing-logos loaded', skillCalls.some((x) => /designing-logos$/.test(x)) || c.prompt.includes('/designing-logos'), skillCalls.join(', '));
+  add('one design document', docs.length === 1, docs.map((p) => basename(dirname(p))).join(', '));
+  if (!docs.length) { writeFileSync(join(dir, 'checks.json'), JSON.stringify(res, null, 2)); return res; }
+  const doc = docs[0], proj = dirname(doc);
+  const { readState } = await import(pathUrl(join(SKILL, 'scripts', 'design.mjs')));
+  const s = readState(doc);
+  const extra = readdirSync(proj).filter((f) => !['design.html', 'export'].includes(f));
+  add('only design.html and export/ in the project', extra.length === 0, extra.join(', '));
+  const firstRound = tr.search(/design\.mjs\\?"? round /);
+  const firstAsk = tr.indexOf('"name":"AskUserQuestion"');
+  add('no question before round 1', firstAsk < 0 || (firstRound >= 0 && firstAsk > firstRound), firstAsk < 0 ? 'no questions' : `question at ${firstAsk}, round at ${firstRound}`);
+  add('round 1 has eight cells', s.rounds[0]?.cells?.length === 8);
   if (c.key === 'E4') {
-    add('scope is ideation', s.scope === 'ideation');
-    add('G3 passed', st.G3 === 'done');
-    const svgs = (function walk(d) { return readdirSync(d).flatMap((f) => { const p = join(d, f); return statSync(p).isDirectory() ? walk(p) : p.endsWith('.svg') ? [p] : []; }); })(wb);
-    add('no SVG drawn', svgs.length === 0, svgs.slice(0, 3).map((p) => basename(p)).join(', '));
+    add('stopped after round 1 to wait for a pick', s.rounds.length === 1 && !s.rounds[0].pick);
   } else {
-    add('every gate passed or skipped', Object.values(st).every((x) => x === 'done' || x === 'skip'), JSON.stringify(st));
-    if (existsSync(join(wb, 'constants.json'))) {
-      const { checkConstants } = await import(pathUrl(join(SKILL, 'scripts', 'check.mjs')));
-      try { const r = checkConstants(join(wb, 'constants.json')); const n = r.reduce((k, x) => k + x.violations.length, 0); add('check.mjs 0 violations', n === 0, `${n} violations`); } catch (e) { add('check.mjs 0 violations', false, e.message); }
-    } else add('constants.json exists', false);
-    add('reviewer report before G4', existsSync(join(wb, 'sheets', 'review-G4.md')));
+    add('settled', s.stage === 'done' || s.stage === 'detail', s.stage);
+    add('settled by round 4', !!s.settled && s.settled.round <= 4, s.settled ? `round ${s.settled.round}` : 'not settled');
+    add('later rounds carry one wildcard', s.rounds.slice(1).every((R) => R.cells.filter((x) => x.outlier).length === 1));
+    add('preferences learned from picks', (s.prefs || []).length > 0, (s.prefs || []).join(', '));
+    add('construction 0 violations', s.detail?.violations === 0, s.detail ? `${s.detail.violations} violations` : 'no detail');
+    add('export written', existsSync(join(proj, 'export', 'mark.svg')) && existsSync(join(proj, 'export', 'favicon.ico')));
   }
-  if (c.key === 'E1') {
-    add('G2 appeared (photo)', st.G2 === 'done');
-    const pal = existsSync(join(wb, 'palette.json')) ? JSON.parse(readFileSync(join(wb, 'palette.json'), 'utf8')) : {};
-    add('palette has region samples', Array.isArray(pal.measured?.regions) ? pal.measured.regions.length > 0 : JSON.stringify(pal).includes('region'));
-  }
-  if (c.key === 'E2') {
-    add('G2 did not appear (no photo)', st.G2 === 'skip');
-    const defs = Object.entries(s.answers || {}).filter(([, a]) => a.source === 'default');
-    add('unknown fields recorded as defaults', defs.length >= 8, `${defs.length} defaults`);
-    add('defaults confirmed at G4', defs.length > 0 && defs.every(([, a]) => a.confirmed), defs.filter(([, a]) => !a.confirmed).map(([k]) => k).join(', '));
-  }
+  if (c.key === 'E1') add('palette attached', !!s.palette?.roles?.accent, JSON.stringify(s.palette?.roles || {}).slice(0, 120));
+  if (c.key === 'E2') add('no photo', !s.photo);
   writeFileSync(join(dir, 'checks.json'), JSON.stringify(res, null, 2));
   return res;
 }

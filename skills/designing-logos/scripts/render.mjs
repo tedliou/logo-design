@@ -163,9 +163,9 @@ export async function exportPackage(target, { out, sizes = [16, 32, 48, 64, 128,
     if ([16, 32, 48].includes(px)) icoParts.push({ px, buf });
   }
   if (icoParts.length) write('favicon.ico', ico(icoParts), `${icoParts.map((p) => p.px).join(', ')} px in one file for older browsers`);
-  const extra = [['construction.svg', 'grid, angles and curve radii over the mark', `node board.mjs construction "${cpath}" --out "${join(out, 'construction.svg')}"`],
+  const extra = [['construction.svg', 'grid, angles and curve radii over the mark', `node design.mjs detail <design.html> <detail.json> (writes it)`],
     ['presentation.png', 'the mark printed on paper; the only place texture appears', `node texture.mjs "${join(out, 'mark.svg')}" --constants "${cpath}" --index --out "${join(out, 'presentation.png')}"`],
-    ['rationale.html', 'the mark, element meanings, construction, small sizes, decisions', `node board.mjs rationale "${base}"`]];
+    ['rationale.html', 'the mark, element meanings, construction, small sizes, decisions', `node design.mjs detail <design.html> <detail.json> (design.html is the rationale)`]];
   const missing = extra.filter(([f]) => !existsSync(join(out, f)));
   const readme = ['# Mark files', '', 'Written by render.mjs export. Each file has a use; leave out what you will not place.', '', '| File | Use |', '|---|---|',
     ...files.map(([f, u]) => `| \`${f}\` | ${u} |`), ...extra.filter(([f]) => existsSync(join(out, f))).map(([f, u]) => `| \`${f}\` | ${u} |`), ''];

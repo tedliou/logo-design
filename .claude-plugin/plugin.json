@@ -1,7 +1,7 @@
 {
   "name": "logo-design",
-  "version": "0.1.0",
-  "description": "Designs trademark-quality logo marks with the user: staged questions, nine-grid ideation, photo measurement, SVG directions checked and rendered at real sizes, and hand-drawn pixel versions for small sizes.",
+  "version": "0.2.0",
+  "description": "Designs logo marks by showing, not asking: one sentence in, a nine-grid of eight drawn directions out; pick a cell and it converges, then construction, small sizes and delivery files. One design document per project.",
   "author": {
     "name": "Ted Liou",
     "url": "https://github.com/tedliou"
@@ -9,5 +9,14 @@
   "homepage": "https://github.com/tedliou/logo-design",
   "repository": "https://github.com/tedliou/logo-design",
   "license": "MIT",
-  "keywords": ["logo", "brand", "trademark", "design", "svg", "pixel-art", "favicon", "ideation"]
+  "keywords": [
+    "logo",
+    "brand",
+    "trademark",
+    "design",
+    "svg",
+    "pixel-art",
+    "favicon",
+    "ideation"
+  ]
 }
