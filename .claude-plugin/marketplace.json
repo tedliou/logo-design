@@ -1,0 +1,16 @@
+{
+  "name": "logo-design",
+  "owner": {
+    "name": "Ted Liou",
+    "url": "https://github.com/tedliou"
+  },
+  "description": "logo-design: logo mark design skills for Claude Code.",
+  "plugins": [
+    {
+      "name": "logo-design",
+      "source": "./",
+      "description": "Designs trademark-quality logo marks with the user, from questions and photos to checked SVG and pixel sprites.",
+      "category": "design"
+    }
+  ]
+}

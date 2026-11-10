@@ -1,0 +1,27 @@
+{
+  "fields": {
+    "purpose": { "value": "部落格「偵錯桐人 VerveCode」的標誌：網站頁首、瀏覽器分頁圖示、Facebook 與 X 的大頭照", "source": "said" },
+    "core": { "value": "有活力、熱忱的開發", "source": "said" },
+    "themes": { "value": "程式碼、AI、遊戲、疊代偵錯；網站頭像是照片裡這隻打哈欠的貓", "source": "said" },
+    "assets": { "value": "網站頭像就是照片裡這隻貓。名稱英文 VerveCode，中文偵錯桐人", "source": "said" },
+    "feeling": { "value": "有活力、熱忱", "source": "said" },
+    "avoid": { "value": "單薄、沒有意義、不像商標的粗糙設計；整個標誌都像素化", "source": "said" },
+    "references": { "value": "Nick Zotov 的 Logos & Marks Collection 2019-2（Behance）", "source": "said" },
+    "localStyle": { "value": "像素只用在局部，代表遊戲", "source": "said" },
+    "culture": { "value": "貓和工程師的聯想，例如 Quora 的〈Why are some programmers obsessed with cats?〉", "source": "said" },
+    "abstraction": { "unknown": true },
+    "color": { "unknown": true },
+    "minSize": { "value": "16 px 的分頁圖示要認得出", "source": "said" },
+    "success": { "value": "商標等級：每個元素說得出理由，16 px 認得出", "source": "said" },
+    "register": { "value": "false：個人網站與社群使用", "source": "said" }
+  },
+  "gates": {
+    "G1": "確認簡報",
+    "G2": "選偏離一般型態最大的兩到三個特徵；抽象程度選 16 px 仍認得出的最抽象那一階；顏色平手時選彩度較高的那個",
+    "G3": "接受標記的母題；概念句選和核心句最相關的兩句",
+    "G4": "選評審排名第一的方向，不保留其他方向的元素",
+    "G5": "每個屬性選 16 px 最清楚的值",
+    "G6": "接受構成規則與色彩，交付全部檔案"
+  },
+  "confirmDefaults": true
+}

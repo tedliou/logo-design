@@ -1,0 +1,27 @@
+{
+  "fields": {
+    "purpose": { "value": "替「20240707 火燒雲」這組照片做系列標誌，用在相簿封面與社群分享圖", "source": "said" },
+    "core": { "unknown": true },
+    "themes": { "unknown": true },
+    "assets": { "value": "沒有，這是新的系列", "source": "said" },
+    "feeling": { "unknown": true },
+    "avoid": { "unknown": true },
+    "references": { "value": "沒有特別欣賞的", "source": "said" },
+    "localStyle": { "value": "不用", "source": "said" },
+    "culture": { "unknown": true },
+    "abstraction": { "unknown": true },
+    "color": { "value": "從照片取色", "source": "said" },
+    "minSize": { "unknown": true },
+    "success": { "unknown": true },
+    "register": { "value": "false：個人相簿使用", "source": "said" }
+  },
+  "gates": {
+    "G1": "確認簡報",
+    "G2": "選偏離一般火燒雲最大的兩到三個特徵；顏色平手時選彩度較高的那個；抽象程度選最小尺寸仍認得出的最抽象那一階",
+    "G3": "接受標記的母題；概念句選最能代表這一晚天色的兩句",
+    "G4": "選評審排名第一的方向，不保留其他方向的元素",
+    "G5": "每個屬性選最小尺寸最清楚的值",
+    "G6": "接受構成規則與色彩，交付全部檔案"
+  },
+  "confirmDefaults": true
+}
