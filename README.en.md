@@ -44,7 +44,7 @@ claude plugin marketplace add tedliou/logo-design
 claude plugin install logo-design@logo-design
 ```
 
-The scripts need Node.js 20 or later and [sharp](https://sharp.pixelplumbing.com/) for rendering and reading photos. After installing the plugin, install sharp once in its folder:
+The scripts need Node.js 20 or later and [sharp](https://sharp.pixelplumbing.com/) for rendering and reading photos. `claude plugin install` installs sharp from `package.json` along with the plugin (tested with Claude Code 2.1.309). If the plugin folder has no `node_modules`, install it by hand:
 
 ```bash
 cd ~/.claude/plugins/cache/logo-design/logo-design/0.1.0 && npm install

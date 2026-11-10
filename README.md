@@ -44,7 +44,7 @@ claude plugin marketplace add tedliou/logo-design
 claude plugin install logo-design@logo-design
 ```
 
-腳本需要 Node.js 20 以上，算圖與讀照片用 [sharp](https://sharp.pixelplumbing.com/)。安裝 plugin 後，到 plugin 的資料夾裝一次 sharp：
+腳本需要 Node.js 20 以上，算圖與讀照片用 [sharp](https://sharp.pixelplumbing.com/)。`claude plugin install` 會依 `package.json` 一併裝好 sharp（Claude Code 2.1.309 實測）。如果 plugin 資料夾裡沒有 `node_modules`，再手動安裝一次：
 
 ```bash
 cd ~/.claude/plugins/cache/logo-design/logo-design/0.1.0 && npm install
