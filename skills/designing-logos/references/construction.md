@@ -48,7 +48,7 @@ Check: `check.mjs <dir>/constants.json` prints 0 violations for the mark and eve
 
 Curve family kinds: `ribbon` (a closed polygon drawn as one side out and the other back, as a tapered stroke; checked for radius, taper and bend) and `arc` (A commands, circles, ellipses; checked for radius). `match` picks the elements by tag, point count, class or id pattern.
 
-Paths are relative to `constants.json`. The full example is `docs/brand/vervecode-logo/constants.json` in the vervecode.dev repository.
+Paths are relative to `constants.json`. The example is the nine-grid cat's own file (case-vervecode.md).
 
 ## The drawing loop
 

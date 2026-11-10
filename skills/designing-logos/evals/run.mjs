@@ -13,6 +13,7 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync, cpSync, readdirSync
 import { join, dirname, resolve, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
+import { tmpdir } from 'node:os';
 
 const EVALS = dirname(fileURLToPath(import.meta.url));
 const SKILL = dirname(EVALS);
@@ -21,7 +22,7 @@ const opt = (n, d) => { const i = args.indexOf(n); return i >= 0 ? args[i + 1] :
 const VALUE = new Set(['--group', '--effort', '--budget', '--model', '--out', '--parallel']);
 const ids = args.filter((a, i) => !a.startsWith('--') && !VALUE.has(args[i - 1]));
 const group = opt('--group', 'skill'), effort = opt('--effort', 'medium'), model = opt('--model', 'opus');
-const out = opt('--out', process.env.LOGO_EVAL_ROOT || 'E:/tmp/logo-eval');
+const out = opt('--out', process.env.LOGO_EVAL_ROOT || join(tmpdir(), 'logo-eval'));
 const parallel = Math.min(3, Number(opt('--parallel', 1)));
 const dry = args.includes('--dry-run');
 

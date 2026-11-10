@@ -1,6 +1,6 @@
 {
   "skill_name": "designing-logos",
-  "notes": "End-to-end cases run with evals/run.mjs (claude -p in an isolated folder under E:/tmp/logo-eval). Interactive gates cannot be answered there, so the skill arm reads fixtures/<case>/answers.json (interview.md, Eval mode) and the bare arm gets the same answers in its prompt. Photos are copied into the run folder; originals are never written to. E3 and E4 also run as plugin evals once the plugin layout exists. Free checks first: node scripts/selftest.mjs.",
+  "notes": "End-to-end cases run with evals/run.mjs (claude -p in an isolated folder under $LOGO_EVAL_ROOT, default <system temp>/logo-eval). Interactive gates cannot be answered there, so the skill arm reads fixtures/<case>/answers.json (interview.md, Eval mode) and the bare arm gets the same answers in its prompt. Photos are copied into the run folder; originals are never written to. E3 and E4 also run as plugin evals once the plugin layout exists. Free checks first: node scripts/selftest.mjs.",
   "evals": [
     {
       "id": 0,

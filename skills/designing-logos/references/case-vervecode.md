@@ -44,7 +44,7 @@ Four of these decided the direction: the reference and prompt, the brand definit
 | `>_` mouth | Chevron and underscore | Mouth | A terminal prompt: the cat speaks code | substitution |
 | Whiskers | Six ribbons, radius 63, taper 8:1, drooping | Whiskers | Sensors: sense first, then act | motion (grounded) |
 
-Its constants are in `docs/brand/vervecode-logo/constants.json` of the vervecode.dev repository: a complete example of grid lines, angle set, a ribbon curve family and a restricted accent.
+Its constants are the example in construction.md: grid lines, an angle set, a ribbon curve family and a restricted accent.
 
 ## Do not copy
 

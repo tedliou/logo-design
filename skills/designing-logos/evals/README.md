@@ -17,7 +17,7 @@ Free checks first:
 node scripts/selftest.mjs
 ```
 
-One case with the skill (the run folder goes under `E:/tmp/logo-eval`, or `--out`):
+One case with the skill (the run folder goes under `$LOGO_EVAL_ROOT`, default `<system temp>/logo-eval`, or `--out`):
 
 ```bash
 node evals/run.mjs E4 --group skill --effort medium
@@ -40,7 +40,7 @@ node evals/run.mjs E0 --group bare --effort max
 Then build the blind sheet from the three run folders, show only `blind.png` or `blind.html` to the judge, and open `key.json` after the answer:
 
 ```bash
-node evals/blind.mjs <run-1> <run-2> <run-3> --out E:/tmp/logo-eval/blind-E0
+node evals/blind.mjs <run-1> <run-2> <run-3> --out <eval root>/blind-E0
 ```
 
 Each run folder keeps `prompt.txt`, `command.txt`, `transcript.jsonl`, `run.json` (cost, turns, minutes) and `checks.json`.
