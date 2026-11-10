@@ -1,6 +1,6 @@
 {
   "skill_name": "designing-logos",
-  "notes": "End-to-end cases run with evals/run.mjs (claude -p in an isolated folder under $LOGO_EVAL_ROOT, default <system temp>/logo-eval). Interactive gates cannot be answered there, so the skill arm reads fixtures/<case>/answers.json (interview.md, Eval mode) and the bare arm gets the same answers in its prompt. Photos are copied into the run folder; originals are never written to. E3 and E4 also run as plugin evals once the plugin layout exists. Free checks first: node scripts/selftest.mjs.",
+  "notes": "End-to-end cases run with evals/run.mjs (claude -p in an isolated folder under $LOGO_EVAL_ROOT, default <system temp>/logo-eval). Nobody can pick in those runs, so the skill arm gets fixtures/<case>/picks.json (a pick rule per round and the round to settle at); the bare arm gets the same information in its prompt. Photos are copied into the run folder; originals are never written to. E3 also runs as a plugin eval. Run the skill arm at xhigh, the effort the skill sets. Free checks first: node scripts/selftest.mjs.",
   "evals": [
     {
       "id": 0,
@@ -8,21 +8,19 @@
       "name": "E0 nine-grid cat replay",
       "files": [],
       "budget": {
-        "skill-medium": 25,
+        "skill-xhigh": 30,
+        "skill-medium": 15,
         "bare-medium": 10,
         "bare-max": 25
       },
-      "prompt": "/designing-logos 幫我的部落格「偵錯桐人 VerveCode」設計標誌，照片在 source/avatar-512x512.png。我現在沒辦法即時回答問題，每一關的答案都在 answers.json，建立工作簿時加 --answers answers.json。完成後把定稿另存一份到 final/mark.svg；如果小尺寸另外畫了版本，存成 final/mark-16.svg、final/mark-32.svg。",
+      "prompt": "/designing-logos 幫我的部落格「偵錯桐人 VerveCode」設計標誌，照片 source/avatar-512x512.png 是網站頭像的那隻貓。核心是有活力、熱忱的開發，意象有程式碼、AI、遊戲、疊代偵錯；參考 Nick Zotov 的 Logos & Marks Collection 2019-2；像素只用在局部，代表遊戲；貓和工程師的聯想可以參考 Quora 的〈Why are some programmers obsessed with cats?〉；不要單薄、沒有意義、不像商標的設計；16 px 的分頁圖示要認得出。我現在沒辦法即時回答，每一輪怎麼選寫在 picks.json，建立設計文件時加 --picks picks.json。完成後把定稿另存一份到 final/mark.svg；如果小尺寸另外畫了版本，存成 final/mark-16.svg、final/mark-32.svg。",
       "bare_prompt": "幫我的部落格「偵錯桐人 VerveCode」設計一個商標等級的標誌。照片 source/avatar-512x512.png 是網站頭像的那隻貓。我現在沒辦法回答問題，需求都在這裡，請直接做完：\n- 用途：網站頁首、瀏覽器分頁圖示、Facebook 與 X 的大頭照\n- 核心：有活力、熱忱的開發\n- 意象：程式碼、AI、遊戲、疊代偵錯；頭像是照片裡這隻打哈欠的貓\n- 名稱：英文 VerveCode，中文偵錯桐人\n- 感覺：有活力、熱忱\n- 不要：單薄、沒有意義、不像商標的粗糙設計；整個標誌都像素化\n- 參考：Nick Zotov 的 Logos & Marks Collection 2019-2（Behance）\n- 局部風格：像素只用在局部，代表遊戲\n- 文化聯想：貓和工程師的聯想，例如 Quora 的〈Why are some programmers obsessed with cats?〉\n- 最小尺寸：16 px 的分頁圖示要認得出\n- 成功條件：每個元素說得出理由，16 px 認得出\n- 個人網站與社群使用，不註冊商標\n先提至少三個方向，再選一個定稿。定稿存成 final/mark.svg（正方形 viewBox、平塗色塊）；如果小尺寸另外畫了版本，存成 final/mark-16.svg、final/mark-32.svg。最後寫 final/rationale.md 說明每個元素的意思。",
-      "expected_output": "Runs P0 to P5 with the cat photo, takes every gate answer from answers.json, measures the photo before drawing, produces at least three directions of different kinds with contact sheets, and ends with constants.json that check.mjs passes. Compared blind against no-skill medium and no-skill max runs; looking like the existing nine-grid cat earns nothing.",
+      "expected_output": "Measures the photo, draws round 1 as the eight corners, follows picks.json for each pick, settles at round 3, builds the final with 0 construction violations, and keeps one working file. Compared blind against the v0.1 skill run and the no-skill medium and max runs.",
       "expectations": [
-        "workbook.mjs status runs before each gate and every gate has an entry in decisions.md",
-        "features.json comes from measure.mjs points on the photo, not from coordinates written without a grid overlay",
-        "at least three directions, each listing its motifs, with no two sharing more than half of them",
-        "every direction has 16 and 32 px renders in a contact sheet",
-        "every element in elements.json has a non-empty literal and figurative meaning",
-        "check.mjs reports 0 violations on the final constants.json",
-        "the author prefers it in a blind comparison with the bare medium and bare max runs"
+        "the project folder holds only design.html and export/",
+        "round 1 covers the eight corners and later rounds carry one wildcard each",
+        "settled by round 4 with 0 construction violations",
+        "the author prefers it in a blind comparison"
       ],
       "notes": "Private fixture: put your own photo in the run folder and list it here."
     },
@@ -32,15 +30,15 @@
       "name": "E1 sunset clouds, no fixed subject",
       "files": [],
       "budget": {
-        "skill-medium": 25
+        "skill-xhigh": 30,
+        "skill-medium": 15
       },
-      "prompt": "/designing-logos 幫「20240707 火燒雲」這組照片做系列標誌，用在相簿封面與社群分享圖。照片在 source/DSC08531-Enhanced-NR.jpg。我現在沒辦法即時回答問題，每一關的答案都在 answers.json，建立工作簿時加 --answers answers.json。完成後把定稿另存一份到 final/mark.svg。",
+      "prompt": "/designing-logos 幫「20240707 火燒雲」這組照片做系列標誌，用在相簿封面與社群分享圖。照片在 source/DSC08531-Enhanced-NR.jpg。我現在沒辦法即時回答，每一輪怎麼選寫在 picks.json，建立設計文件時加 --picks picks.json。完成後把定稿另存一份到 final/mark.svg；如果小尺寸另外畫了版本，存成 final/mark-16.svg、final/mark-32.svg。",
       "expected_output": "Treats a subject without a fixed shape: the feature table finds the cloud's sweep, the horizon band and the skyline silhouette; the palette includes the pink cloud through region sampling; no element of the nine-grid cat appears.",
       "expectations": [
-        "palette.json has region samples for the pink cloud and the horizon, not only area clusters",
-        "features.json names the cloud sweep, the horizon band or the skyline silhouette with how each differs from a typical sunset",
-        "no direction uses an element from the do-not-copy list in case-vervecode.md",
-        "G2 appears because a photo was given"
+        "the palette has region samples for the pink cloud and the horizon",
+        "no cell uses a shape from the do-not-copy list in case-vervecode.md",
+        "settled by round 4 with 0 construction violations"
       ],
       "notes": "Private fixture: put your own photo in the run folder and list it here."
     },
@@ -50,15 +48,15 @@
       "name": "E2 user who cannot say what they want",
       "files": [],
       "budget": {
-        "skill-medium": 25
+        "skill-xhigh": 30,
+        "skill-medium": 15
       },
-      "prompt": "/designing-logos 我想幫我家的腳踏車行做個標誌，但我也說不太出來要什麼。我現在沒辦法即時回答問題，我的回答都在 answers.json，建立工作簿時加 --answers answers.json。完成後把定稿另存一份到 final/mark.svg。",
-      "expected_output": "Steps each unanswered field down to L4 instead of repeating questions, records those answers with --source default, shows them again at G4 and records confirm before passing G4. No photo, so G2 never appears and P1 inventories letterforms and cycling signs without stopping.",
+      "prompt": "/designing-logos 我想幫我家的腳踏車行「阿德單車」做個標誌，但我也說不太出來要什麼。我現在沒辦法即時回答，每一輪怎麼選寫在 picks.json，建立設計文件時加 --picks picks.json。完成後把定稿另存一份到 final/mark.svg；如果小尺寸另外畫了版本，存成 final/mark-16.svg、final/mark-32.svg。",
+      "expected_output": "Asks nothing before round 1, draws eight corners, learns preferences from the picks, settles at round 3 and delivers.",
       "expectations": [
-        "fields the user could not answer are recorded with source default",
-        "G4 shows the defaults again and workbook.mjs confirm runs before pass G4",
-        "G2 does not appear",
-        "no question is repeated in other words after a field reached L4"
+        "no question before round 1",
+        "learned preferences recorded after the picks",
+        "settled by round 4 with 0 construction violations"
       ]
     },
     {
@@ -84,17 +82,18 @@
     {
       "id": 4,
       "key": "E4",
-      "name": "E4 nine-grid only",
+      "name": "E4 the first reply is a board",
       "files": [],
       "budget": {
-        "skill-medium": 8
+        "skill-xhigh": 8,
+        "skill-medium": 5
       },
-      "prompt": "/designing-logos 用九宮格幫我想 VerveCode 的品牌主題就好，先不用畫。我現在沒辦法即時回答問題，我的回答都在 answers.json，建立工作簿時加 --answers answers.json。",
-      "expected_output": "Initializes with --scope ideation, asks only what the grid needs, builds the meaning grid with eight lenses and 64 motifs that pass workbook.mjs check, stops after G3 and draws nothing.",
+      "prompt": "幫我設計一個 logo：阿德單車，街坊信得過的修車師傅。",
+      "expected_output": "Loads the skill, asks nothing, and ends its first reply with round 1 in design.html: eight drawn cells around the brief.",
       "expectations": [
-        "state.json scope is ideation",
-        "mandala.json passes workbook.mjs check",
-        "no SVG is written and no gate after G3 is asked"
+        "designing-logos is loaded",
+        "no AskUserQuestion before the round is added",
+        "design.html holds one round of eight cells"
       ]
     }
   ]

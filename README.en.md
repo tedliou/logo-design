@@ -2,37 +2,42 @@
 
 [正體中文](README.md)
 
-logo-design is a Claude Code plugin for designing logo marks. Claude first asks what the mark should say, then measures the photo, generates ideas, draws and checks, and delivers files you can use as a real mark: every element has a reason, the construction can be measured, and the mark is still recognizable as a 16 px browser tab icon.
+logo-design is a Claude Code plugin for designing logo marks. Give it one sentence and Claude draws a 3 x 3 board right away: the brief in the center and eight logo directions around it. Tap one, it moves to the center and eight finer variations grow around it; after a few rounds the direction settles, and only then does Claude build the construction grid, small sizes and delivery files.
 
-Asking a model directly for a logo often returns a nice illustration, because nobody asked what the mark should say or why it looks the way it does. This plugin puts those questions into the flow. Claude researches, measures, draws and checks; you decide at up to six gates. When you cannot answer a question, Claude offers a contrast, cards to compare, or a default to veto, instead of asking again.
+![Round 1 for a bike shop: the brief in the center, eight directions around it, each with its 32 and 16 px renders](docs/images/round1-ade.png)
 
-## Components
+The board above is the skill's own round 1 for the single sentence "Ade Cycles, the neighborhood repair shop people trust".
 
-| Component | What it does |
+## Use
+
+```text
+Design a logo: Ade Cycles, the neighborhood repair shop people trust
+```
+
+- The first reply is the board. Claude asks nothing first, except the brand name when it is missing.
+- Answer each round with a letter ("B"), two letters to mix them ("B D"), and optionally a sentence ("B, rounder").
+- Say "this is the one" when it is. Claude then builds the construction grid, redraws 16 and 32 px, makes one-color and inverse versions, and exports the files.
+- Give a photo with the brief ("turn this photo into a mark: ~/Pictures/cat.jpg") and Claude measures its features and colors first, without questions.
+
+## What each round draws
+
+| Round | The eight cells |
 | --- | --- |
-| `designing-logos` skill | The full flow for a vector mark: questions, photo measurement and color sampling, a meaning grid and a form grid (nine-grid ideation), directions and variants, construction rules, the delivery package |
-| `designing-pixel-logos` skill | Marks drawn entirely as pixel art, and pixel-by-pixel 16 and 32 px versions of a vector mark |
-| `logo-critic` subagent | Reads the contact sheet (every candidate at several sizes and backgrounds on one image) with a clean context, says what it sees first, and recommends which directions to drop, using the [rubric](skills/designing-logos/references/rubric.md). It never sees the designer's reasons, so it cannot be talked into anything |
+| 1 | Eight concepts, each fusing two or three motifs into one shape ("the yawning mouth is a flame"). With a photo, every cell uses its strongest feature |
+| 2 | Your pick redrawn with eight form operations: silhouette, skeleton, motion, figure-ground, subtraction, fusion, substitution, cut |
+| 3 and later | One detail changed per cell: container, weight, where the accent sits |
 
-## Flow
+From round 2 on, one cell is a deliberate wildcard so the search does not narrow too early. Round 1 also spreads its cells over three pairs people tell apart at a glance: round or angular (Jiang et al. 2016), static or dynamic (Cian et al. 2014), figurative or letter (Luffarelli, Mudra and Mahmood 2019). Seeing several designs at once beats refining one at a time (Dow et al. 2010), and moving the pick to the center resembles Picbreeder's branching. Sources and their verification status are in [evidence.md](skills/designing-logos/references/evidence.md).
 
-Claude works through the stages on the left; you decide at the gates on the right.
+The skill runs at xhigh effort. With a photo and a short brief, three rounds and the final took about an hour and about 16 USD on Opus 5.5 in testing.
 
-```
-Start: brand name, optionally a photo or an old mark
-  P0 Interview ............ G1 confirm the brief
-  P1 Measure the photo .... G2 pick 2 or 3 features and the abstraction level (photo only)
-  P2 Meaning grid ......... G3 accept the suggested motifs, pick concepts
-  P3 Form grid, directions  G4 pick a direction, keep parts of the others
-  P4 Variants ............. G5 one winner per attribute (more than two attributes only)
-  P5 Construction ......... TM similar-mark search (registration or formal use only)
-                            G6 confirm rules, colors and deliverables
-```
+## One design document
 
-- The meaning grid decides what the mark says: a core sentence in the center, eight themes around it on eight lenses (subject, name, audience, action, method, analogy, time, tension), and eight drawable motifs per theme.
-- The form grid decides how it is drawn: a concept sentence in the center and eight thumbnails, one per form operation (silhouette, skeleton, motion, figure-ground, subtraction, fusion, substitution, cut).
-- Variants change one attribute at a time, such as the eye, stroke width or corner radius. With one or two attributes, those questions are asked at G4.
-- Every answer, its source and its reason go into a workbook folder, so a new session continues from the files.
+Each project has one working file, `design.html`: every round, every pick and the final, readable in any browser, including on a phone.
+
+- When Claude Code can publish Artifact pages (desktop or CLI, Pro plan or above, signed in with a claude.ai account), round 1 asks once whether to open the document as a page; later rounds update the same link.
+- On the page, tap cells, press "Copy for Claude" and paste the line into the chat. The page cannot send clicks to Claude, so this step is needed; typing the letter in the chat works too.
+- After the final, delivery files sit next to `design.html` in `export/`: color, one-color and inverse SVG, PNG from 16 to 1024 px, favicon.ico, a construction sheet, a presentation sheet and a README listing each file's use.
 
 ## Install
 
@@ -47,50 +52,31 @@ claude plugin install logo-design@logo-design
 The scripts need Node.js 20 or later and [sharp](https://sharp.pixelplumbing.com/) for rendering and reading photos. `claude plugin install` installs sharp from `package.json` along with the plugin (tested with Claude Code 2.1.309). If the plugin folder has no `node_modules`, install it by hand:
 
 ```bash
-cd ~/.claude/plugins/cache/logo-design/logo-design/0.1.0 && npm install
+cd ~/.claude/plugins/cache/logo-design/logo-design/0.2.0 && npm install
 ```
 
-Or set `LOGO_SHARP_FROM` to the `package.json` of another project that has sharp. Without sharp, the interview, the nine-grid and the workbook still work; measuring, color sampling, contact sheets and the delivery package stop and say how to install it.
+Design documents live in `~/logo-work/<name>/`; set `LOGO_WORK_ROOT` to move them.
 
-## Use
+## Components
 
-Say "design a logo for ...", "turn this photo into a mark" or "brainstorm brand themes on a nine-grid", or call it directly:
-
-```text
-/logo-design:designing-logos Ade Cycles ~/Pictures/shop.jpg
-```
-
-- Workbooks live in `~/logo-work/<name>/`; set `LOGO_WORK_ROOT` to move them. Photos are copied in; Claude never writes to the originals.
-- For brand themes only, Claude builds the meaning grid and stops after G3.
-- Stable preferences you state go to `~/logo-work/taste.md` and are not asked again in the next project.
-
-The delivery package contains:
-
-- color, one-color and inverse SVG
-- PNG from 16 to 1024 px
-- favicon.ico
-- a construction sheet: grid, angles and curve radii over the mark
-- a presentation sheet: paper fibers, misregistration and grain simulated with SVG filters
-- one HTML page with each element's meaning and the decision log
-
-Each file is listed with its use, and you can drop files at G6.
+| Component | What it does |
+| --- | --- |
+| `designing-logos` skill | Nine-grid rounds, photo measurement and color sampling, construction checks, the delivery package |
+| `designing-pixel-logos` skill | Marks drawn entirely as pixel art, and pixel-by-pixel 16 and 32 px versions of a vector mark |
+| `logo-critic` subagent | Looks at round 1 before you do and flags cells that are the same idea or unreadable at 16 px; it never sees the designer's reasons |
 
 ## Limits
 
-- Claude does not use an image generation model. The mark is SVG written by Claude; PNG and favicon.ico are rendered from it, and the small pixel versions are placed pixel by pixel. The presentation texture is not photographic.
-- The similar-mark check is a web search for marks with the same subject and treatment. It is not a legal trademark search. Before registering, search the WIPO Global Brand Database and your national office yourself; Claude prepares search terms and suggested figurative classification codes.
-- Taste stays with you. `logo-critic` and the check scripts only remove clear failures.
-- The skill's rules cite design and marketing research. Each source carries a status (abstract read, secondary only, to verify) in `skills/designing-logos/references/evidence.md`. Check the ones marked "to verify" before quoting them.
+- Claude does not use an image generation model. Every cell is SVG written by Claude; PNG and favicon.ico are rendered from it. The presentation sheet's paper fibers, misregistration and grain are SVG filters, not photographic print texture.
+- The similar-mark check is a web search, not a legal trademark search. Before registering, search the WIPO Global Brand Database and your national office yourself.
+- Taste stays with you. The reviewer and the check scripts only remove clear failures.
 
 ## For developers: evals
 
-There are five eval cases (E0 to E4), described in `skills/designing-logos/evals/README.md`. E0 to E2 need a person to judge the marks; run them with your own photos. `evals/` holds the two cases that need no judging, for `claude plugin eval`:
-
-- E3 checks which skill each of three requests loads.
-- E4 checks that the nine-grid-only flow stops at G3 and draws no SVG.
+End-to-end cases and how to run them: [skills/designing-logos/evals/README.md](skills/designing-logos/evals/README.md). `evals/` holds cases for `claude plugin eval`: E3 checks which skill each of three requests loads, E4 checks that one sentence in gives a board as the first reply.
 
 ```bash
-claude plugin eval . --ablation none --allow-tools Bash --runs 1
+claude plugin eval . --ablation none --runs 1 --allow-tools Bash
 ```
 
 E4 runs Node scripts, and `claude plugin eval` runs a shell only where it can sandbox it, currently Linux and macOS. On Windows, use `node skills/designing-logos/evals/run.mjs E4 --group skill`.

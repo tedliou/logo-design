@@ -9,9 +9,9 @@ export const SVG_FONT = '"Segoe UI","Microsoft JhengHei","PingFang TC","Noto San
 const TOKENS_LIGHT = '--bg:#f4f4f5;--surface:#ffffff;--text:#18181b;--muted:#52525b;--line:#d4d4d8;--accent:#b4233f;--keep:#0f766e;--off:#e4e4e7';
 const TOKENS_DARK = '--bg:#131316;--surface:#1c1c20;--text:#f4f4f5;--muted:#a1a1aa;--line:#3f3f46;--accent:#f0607c;--keep:#2dd4bf;--off:#27272a';
 
-export function page({ title, description = '', body, extraCss = '' }) {
+export function page({ title, description = "", body, extraCss = "", lang = "en" }) {
   return `<!doctype html>
-<html lang="en">
+<html lang="${esc(lang)}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">

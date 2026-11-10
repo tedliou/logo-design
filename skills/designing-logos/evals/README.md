@@ -1,13 +1,13 @@
 # End-to-end evals
 
-These cases run the whole flow with `claude -p` in an isolated folder, because a logo is judged by looking at it and the gates need pre-filled answers. Trigger checks (E3) and the nine-grid-only flow (E4) also run as plugin evals from the plugin's `evals/` folder. `claude plugin eval` runs a shell only inside a sandbox (Linux and macOS today), so on Windows E4 runs here instead.
+These cases run the skill with `claude -p` in an isolated folder, because a logo is judged by looking at it and nobody is there to pick. Each case's `fixtures/<case>/picks.json` gives a pick rule per round and the round to settle at; `design.mjs status` prints the rule for the current round in eval mode. Trigger checks (E3) also run as a plugin eval from the plugin's `evals/` folder; `claude plugin eval` runs a shell only inside a sandbox (Linux and macOS today), so the flow cases run here.
 
 | Case | Input | Checked by script | Judged by a person |
 |---|---|---|---|
-| E0 | Cat photo, the author's brief from 2026-11-08 | Gates, decisions, workbook JSON, `check.mjs` 0 violations, reviewer report | Blind: skill at medium against no skill at medium and at max |
-| E1 | A sunset photo, a mostly default brief | Same, plus G2 appears and the palette has region samples | No shape from the nine-grid cat's do-not-copy list appears |
-| E2 | No photo, nearly every field unknown | Same, plus G2 skipped, unknown fields recorded as defaults and confirmed at G4 | Questions step down instead of repeating |
-| E4 | Core and themes only | Ideation scope, G3 passed, no SVG | The grid's quality |
+| E0 | Cat photo and the author's brief from 2026-11-08 | One design document, eight corners in round 1, one wildcard per later round, settled by round 4, 0 construction violations, export written | Blind: against earlier runs and no-skill medium and max |
+| E1 | A sunset photo, a mostly empty brief | Same, plus a measured palette | No shape from the nine-grid cat's do-not-copy list |
+| E2 | No photo, "I can't say what I want" | Same, plus no question before round 1 and learned preferences | Whether the picks led somewhere sensible |
+| E4 | One sentence, no eval rules | The first reply ends with round 1 in design.html and no question before it | Whether round 1 shows eight real directions |
 
 ## Run
 
@@ -17,27 +17,19 @@ Free checks first:
 node scripts/selftest.mjs
 ```
 
-One case with the skill (the run folder goes under `$LOGO_EVAL_ROOT`, default `<system temp>/logo-eval`, or `--out`):
+One case with the skill (run folders go under `$LOGO_EVAL_ROOT`, default `<system temp>/logo-eval`, or `--out`):
 
 ```bash
-node evals/run.mjs E4 --group skill --effort medium
+node evals/run.mjs E4 --group skill --effort xhigh
 ```
 
-E0's three arms, at most three at once:
-
-```bash
-node evals/run.mjs E0 --group skill --effort medium
-```
-
-```bash
-node evals/run.mjs E0 --group bare --effort medium
-```
+No-skill arms for a blind comparison:
 
 ```bash
 node evals/run.mjs E0 --group bare --effort max
 ```
 
-Then build the blind sheet from the three run folders, show only `blind.png` or `blind.html` to the judge, and open `key.json` after the answer:
+Then build the blind sheet from the run folders, show only `blind.png` or `blind.html` to the judge, and open `key.json` after the answer:
 
 ```bash
 node evals/blind.mjs <run-1> <run-2> <run-3> --out <eval root>/blind-E0
@@ -47,8 +39,8 @@ Each run folder keeps `prompt.txt`, `command.txt`, `transcript.jsonl`, `run.json
 
 ## Cost
 
-Budgets per arm are in `evals.json` and passed as `--max-budget-usd`; a run that reaches its budget stops where it is. Run only the cases a change affects. The full matrix runs only when the author asks for it.
+Budgets per arm are in `evals.json` and passed as `--max-budget-usd`; a run that reaches its budget stops where it is. Run only the cases a change affects; the full matrix runs only when the author asks for it.
 
 ## Fixtures
 
-`fixtures/<case>/answers.json` holds the answers the user would give (interview.md, "Eval mode"). Photos are listed in `evals.json` under `files` and copied into the run folder. E1's photo is the author's own and stays out of any public copy of this skill; replace it with your own photo of a subject without a fixed shape.
+Photos are listed in `evals.json` under `files` and copied into the run folder. E1's photo is the author's own and stays out of any public copy of this skill; use your own photo of a subject without a fixed shape.

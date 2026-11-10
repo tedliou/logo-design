@@ -1,9 +1,8 @@
 #!/usr/bin/env node
-// Self-test for the scripts that need no model: run after changing check.mjs, workbook.mjs or lib/.
+// Self-test for the scripts that need no model: run after changing any script.
 //   node selftest.mjs
 import { checkSvg } from './check.mjs';
-import { gateStates, checkDirections, motifOverlap } from './workbook.mjs';
-import { wrap } from './board.mjs';
+import { checkRound, checkCellSvg, renderHtml, ui, IDS } from './design.mjs';
 import { ico } from './render.mjs';
 import { presentationSvg } from './texture.mjs';
 import { parsePath } from './lib/svg.mjs';
@@ -65,26 +64,33 @@ ok(segs.filter((s) => s.kind === 'line').length === 4 && segs[segs.length - 1].t
 ok(Math.abs(contrast('#000000', '#ffffff') - 21) < 0.01, 'WCAG contrast black on white is 21');
 ok(oklabToHex(hexToOklab('#dc3d5c')) === '#dc3d5c', 'OKLab round trip keeps the hex');
 
-// conditional gates
-const st = (c, scope = 'full') => Object.fromEntries(gateStates({ scope, gates: {}, conditions: c }).map((g) => [g.id, g.state]));
-let g = st({ photo: false, attributes: 2, register: false });
-ok(g.G2 === 'skip' && g.G5 === 'skip' && g.TM === 'skip', 'no photo, two attributes, no registration: G2, G5 and TM do not appear');
-g = st({ photo: true, attributes: 3, register: true });
-ok(g.G2 === 'open' && g.G5 === 'open' && g.TM === 'open', 'photo, three attributes, registration: G2, G5 and TM appear');
-g = st({ photo: false, attributes: null, register: false }, 'ideation');
-ok(g.G4 === 'skip' && g.G6 === 'skip' && g.G3 === 'open', 'ideation scope stops after G3');
+// rounds: eight cells, round 1 covers the eight corners, later rounds carry exactly one wildcard
+const cellSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><rect width="96" height="96" fill="#fafafa"/><circle cx="48" cy="48" r="30" fill="#18181b"/></svg>';
+const corners = [];
+for (const a of ['round', 'angular']) for (const b of ['static', 'dynamic']) for (const c of ['figurative', 'letter']) corners.push([a, b, c]);
+const round1 = { cells: IDS.map((id, i) => ({ id, axes: corners[i], tag: `t${id}`, concept: `concept ${id}`, motifs: [`m${id}1`, `m${id}2`], why: 'w', svg: cellSvg })) };
+ok(checkRound(round1, 1).errs.length === 0, 'round 1 with eight concepts spread over both sides of each pair passes');
+ok(checkRound({ cells: round1.cells.map(({ concept, ...c }) => c) }, 1).errs.some((e) => /needs concept/.test(e)), 'round 1 cells without a concept fail');
+ok(checkRound({ cells: round1.cells.map((c) => ({ ...c, axes: ['round', c.axes[1], c.axes[2]] })) }, 1).errs.some((e) => /both sides of each pair/.test(e)), 'round 1 with only round shapes fails');
+ok(checkRound({ cells: round1.cells.slice(0, 7) }, 1).errs.some((e) => /needs 8 cells/.test(e)), 'a round with seven cells fails');
+const OPS = ['silhouette', 'skeleton', 'motion', 'figure-ground', 'subtraction', 'fusion', 'substitution'];
+const round2 = { cells: IDS.map((id, i) => ({ id, tag: `t${id}`, why: 'w', svg: cellSvg, ...(i === 7 ? { outlier: true, concept: 'another idea', motifs: ['a', 'b'] } : { op: OPS[i] }) })) };
+ok(checkRound(round2, 2).errs.length === 0, 'round 2 with seven operations and one wildcard passes');
+ok(checkRound({ cells: round2.cells.map((c) => (c.op ? { ...c, op: 'fusion' } : c)) }, 2).errs.some((e) => /operations repeat/.test(e)), 'round 2 repeating one operation fails');
+const round3 = { cells: round2.cells.map(({ op, ...c }) => c) };
+ok(checkRound(round3, 3).errs.length === 0, 'round 3 changes attributes without operations');
+ok(checkRound({ cells: round3.cells.map(({ outlier, ...c }) => c) }, 3).errs.some((e) => /exactly one cell with outlier/.test(e)), 'a later round without a wildcard fails');
+ok(checkCellSvg('<svg viewBox="0 0 96 96"><text x="10" y="50">A</text></svg>', 'A').errs.some((e) => /live <text>/.test(e)), 'a cell with live text fails');
+ok(checkCellSvg('<svg viewBox="0 0 96 96"><defs><linearGradient id="g"/></defs><rect width="96" height="96" fill="url(#g)"/></svg>', 'A').errs.some((e) => /gradient/.test(e)), 'a cell with a gradient fails');
+ok(checkCellSvg('<svg viewBox="0 0 96 64"><rect width="96" height="64" fill="#000"/></svg>', 'A').errs.some((e) => /not square/.test(e)), 'a cell with a wide viewBox fails');
 
-// directions: count, kinds, motif overlap
-const D = (id, kind, motifs) => ({ id, kind, motifs, ops: ['fusion'], svg: `directions/${id}/mark.svg` });
-ok(checkDirections([D('A', 'open', ['a', 'b']), D('B', 'closed', ['c', 'd']), D('C', 'letter', ['a', 'e'])]).length === 0, 'three directions of different kinds with 50% overlap pass');
-ok(checkDirections([D('A', 'open', ['a']), D('B', 'closed', ['b'])]).some((e) => /at least 3/.test(e)), 'two directions fail');
-ok(checkDirections([D('A', 'open', ['a']), D('B', 'open', ['b']), D('C', 'open', ['c'])]).some((e) => /same kind/.test(e)), 'three directions of one kind fail');
-ok(checkDirections([D('A', 'open', ['a', 'b', 'c']), D('B', 'closed', ['a', 'b', 'd']), D('C', 'letter', ['e'])]).some((e) => /A and B share 67%/.test(e)), 'directions sharing more than half their motifs fail');
-ok(Math.abs(motifOverlap(['a', 'b'], ['b', 'c', 'd']) - 0.5) < 1e-9, 'overlap is shared over the smaller set');
-
-// text wrap for board labels: CJK breaks between characters, Latin between words
-ok(JSON.stringify(wrap('one two three four', 4)) === JSON.stringify(['one two', 'three', 'four']), 'wrap breaks Latin text between words');
-ok(wrap('\u4e00\u4e8c\u4e09\u56db\u4e94\u516d', 4).length === 2, 'wrap breaks CJK text between characters');
+// the design document keeps its state, in both languages, and nothing breaks out of the script tag
+const state = { version: 2, name: 'Test</script>', lang: 'zh-TW', brief: 'b', stage: 'explore', prefs: ['round'], rounds: [{ n: 1, center: null, cells: round1.cells, pick: null }], log: [] };
+const html = await renderHtml(state);
+const back = JSON.parse(html.match(/<script type="application\/json" id="design-state">([\s\S]*?)<\/script>/)[1].replace(/<\\\//g, '</'));
+ok(back.name === 'Test</script>' && back.rounds[0].cells.length === 8, 'the state survives the round trip through design.html');
+ok(html.includes(ui('zh-TW').send) && renderHtml.length >= 1, 'the document uses the strings of its language');
+ok((html.match(/class="cell pick/g) || []).length === 8, 'the live board has eight tappable cells');
 
 // favicon.ico header
 const fake = (px) => ({ px, buf: Buffer.from([137, 80, 78, 71, px]) });

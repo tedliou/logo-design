@@ -1,8 +1,8 @@
 # Style recipes
 
-A recipe is an optional set of form rules, color rules and presentation settings that the user chooses in the brief (references, localStyle, feeling). It shapes P3; it never replaces the meaning grid. Without a choice, use none: the brief's feeling rules are enough.
+A recipe is an optional set of form rules, color rules and presentation settings. Use one when the user names a style or reference in the brief or a note; from then on, the cells of the next rounds follow it. Without one, the picks decide the style.
 
-Each recipe states where its style signal may appear. Rule 4 of SKILL.md still holds: a signal goes only where it refers to something.
+Each recipe states where its style signal may appear: a signal goes only on the part it refers to.
 
 ## Post-digital Swiss
 
@@ -50,4 +50,4 @@ From the prompt the user once gave an image model, split into its parts.
 
 ## Adding a recipe
 
-A recipe the user brings (a designer's collection, a movement, a period) goes through research.md first: write its principle card, then turn "can take" into the five lines above. A recipe without a card is a mood, not a rule.
+A recipe the user brings (a designer's collection, a movement, a period) first gets two lists: the principles that can be taken (simplification, construction, figure and ground, terminals) and the shapes and signatures that must not be copied. Turn the principles into the five lines above; a recipe without that split is a mood, not a rule.
